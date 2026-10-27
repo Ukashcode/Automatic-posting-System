@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:akth_posting_web/pages/dashboard_page.dart';
-import 'package:akth_posting_web/pages/record_page.dart';
+
 void main() {
   runApp(const AKTHApp());
 }
