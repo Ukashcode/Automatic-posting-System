@@ -14,8 +14,8 @@ class AKTHApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: ' SIWES Posting System',
-      // home: Dashboard(),
-      home: Record(),
+      home: Dashboard(),
+      // home: Record(),
     );
   }
 }

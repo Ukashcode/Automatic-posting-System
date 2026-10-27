@@ -1,13 +1,8 @@
 import 'package:flutter/material.dart';
-
-class Dashboard extends StatefulWidget {
+import 'package:akth_posting_web/pages/record_page.dart';
+class Dashboard extends StatelessWidget {
   const Dashboard({super.key});
 
-  @override
-  State<Dashboard> createState() => _DashboardState();
-}
-
-class _DashboardState extends State<Dashboard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,7 +16,7 @@ class _DashboardState extends State<Dashboard> {
             // I had a problem with positioning my two text fields and later found it is because,
             // of the parent widget set Constarints to its child.
             //I tackle the issue and set the correct spacing
-            child: Column(
+            child: ListView(
               children: [
                 Padding(
                   padding: const EdgeInsets.only(top: 20, left: 5),
@@ -58,54 +53,67 @@ class _DashboardState extends State<Dashboard> {
                   padding: const EdgeInsets.only(left: 20),
                   child: Column(
                     children: [
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.dashboard_outlined,
-                            color: Colors.green,
-                            size: 30,
-                          ),
-                          SizedBox(width: 10),
-                          Text(
-                            "Dashboard",
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
+                      
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.dashboard_outlined,
+                              color: Colors.green,
+                              size: 30,
                             ),
-                          ),
-                        ],
-                      ),
+                            SizedBox(width: 10),
+                            Text(
+                              "Dashboard",
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      
                       SizedBox(height: 20),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.people_outline,
-                            color: Colors.green,
-                            size: 30,
-                          ),
-                          SizedBox(width: 10),
-                          Text(
-                            "Record",
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
+                      InkWell(
+                         onTap: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context)=> Record()));
+                        },
+                        child: Row(
+                          
+                          children: [
+                            Icon(
+                              Icons.people_outline,
+                              color: Colors.green,
+                              size: 30,
                             ),
-                          ),
-                        ],
+                            SizedBox(width: 10),
+                            Text(
+                              "Record",
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                       SizedBox(height: 400),
-                      Row(
-                        children: [
-                          Icon(Icons.logout, color: Colors.red, size: 30),
-                          SizedBox(width: 10),
-                          Text(
-                            "Logout",
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
+                      InkWell(
+                        onTap: () {
+                          
+                        },
+                        child: Row(
+                          children: [
+                            Icon(Icons.logout, color: Colors.red, size: 30),
+                            SizedBox(width: 10),
+                            Text(
+                              "Logout",
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ],
                   ),
