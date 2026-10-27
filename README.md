@@ -11,10 +11,10 @@ A Flutter web interface prototype for managing SIWES student records and posting
 
 The Student Registry adapts to different browser widths:
 
-- On wide screens, navigation stays in a left sidebar.
-- On narrower screens, navigation moves into a menu drawer.
-- The form fields use two columns when there is room and stack vertically on smaller screens.
-- The page content scrolls vertically, while the records table can scroll horizontally when its columns do not fit.
+- On wide screens, navigation stays in a left sidebar; on narrower screens, it moves into a menu drawer.
+- Dashboard summary cards sit side by side when there is room and stack on smaller screens.
+- Student form fields use two columns when there is room and stack vertically on smaller screens.
+- Both pages scroll vertically, and the registry table can scroll horizontally when its columns do not fit.
 - Fixed content widths and large fixed spacer gaps were removed to avoid common small-screen overflow.
 
 ## Current limitations
