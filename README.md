@@ -1,17 +1,33 @@
-# akth_posting_web
+# AKTH SIWES Posting System
 
-A new Flutter project.
+A Flutter web interface prototype for managing SIWES student records and postings.
 
-## Getting Started
+## Current screens
 
-This project is a starting point for a Flutter application.
+- **Dashboard:** displays student and available-unit summary cards and a posting action.
+- **Student Registry:** provides fields for a student's name, phone number, and group, plus a records table.
 
-A few resources to get you started if this is your first Flutter project:
+## Responsive Student Registry
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+The Student Registry adapts to different browser widths:
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- On wide screens, navigation stays in a left sidebar.
+- On narrower screens, navigation moves into a menu drawer.
+- The form fields use two columns when there is room and stack vertically on smaller screens.
+- The page content scrolls vertically, while the records table can scroll horizontally when its columns do not fit.
+- Fixed content widths and large fixed spacer gaps were removed to avoid common small-screen overflow.
+
+## Current limitations
+
+This is still a UI prototype. Student submission and posting generation are not connected to data storage or a backend, and the displayed dashboard totals are placeholders. Logout is also not implemented.
+
+## Run locally
+
+Install Flutter, then run:
+
+```sh
+flutter pub get
+flutter run -d chrome
+```
+
+The project requires a Dart SDK matching the constraint in `pubspec.yaml`.

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:akth_posting_web/student.dart';
+
 class Record extends StatefulWidget {
   const Record({super.key});
 
@@ -8,362 +8,230 @@ class Record extends StatefulWidget {
 }
 
 class _RecordState extends State<Record> {
+  static const Color _pageColor = Color.fromRGBO(248, 248, 248, 1);
+  static const Color _mutedColor = Color.fromARGB(255, 143, 141, 141);
 
-  void addStudent() {
-    
-  }
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color.fromRGBO(248, 248, 248, 1),
-      body: Row(
-        children: [
-          Container(
-            width: 200,
-            color: Colors.white,
-            //Column below is the parent widget and every parent set Contraints or rules
-            // I had a problem with positioning my two text fields and later found it is because,
-            // of the parent widget set Constarints to its child.
-            //I tackle the issue and set the correct spacing
-            child: ListView(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 20, left: 5),
-
-                  child: Column(
-                    children: [
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          "AKTH",
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.green,
-                            fontWeight: FontWeight.w100,
-                          ),
-                        ),
-                      ),
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          "Siwes posting System",
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: const Color.fromARGB(255, 143, 141, 141),
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
+  Widget _navigation({bool inDrawer = false}) {
+    return Container(
+      width: inDrawer ? null : 200,
+      color: Colors.white,
+      child: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Padding(
+              padding: EdgeInsets.fromLTRB(20, 20, 12, 0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('AKTH', style: TextStyle(fontSize: 20, color: Colors.green)),
+                  Text(
+                    'Siwes Posting System',
+                    style: TextStyle(fontSize: 12, color: _mutedColor, fontWeight: FontWeight.bold),
                   ),
-                ),
-                SizedBox(height: 50),
-                Padding(
-                  padding: const EdgeInsets.only(left: 20),
-                  child: Column(
-                    children: [
-                      InkWell(
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.dashboard_outlined,
-                              color: Colors.green,
-                              size: 30,
-                            ),
-                            SizedBox(width: 10),
-                            Text(
-                              "Dashboard",
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 20),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.people_outline,
-                            color: Colors.green,
-                            size: 30,
-                          ),
-                          SizedBox(width: 10),
-                          Text(
-                            "Record",
-
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 400),
-                      Row(
-                        children: [
-                          Icon(Icons.logout, color: Colors.red, size: 30),
-                          SizedBox(width: 10),
-                          Text(
-                            "Logout",
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
+            const SizedBox(height: 36),
+            _navItem(
+              icon: Icons.dashboard_outlined,
+              label: 'Dashboard',
+              onTap: () => Navigator.pop(context),
+            ),
+            _navItem(icon: Icons.people_outline, label: 'Record', selected: true),
+            const Spacer(),
+            _navItem(icon: Icons.logout, label: 'Logout', color: Colors.red),
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _navItem({
+    required IconData icon,
+    required String label,
+    VoidCallback? onTap,
+    bool selected = false,
+    Color color = Colors.green,
+  }) {
+    return ListTile(
+      leading: Icon(icon, color: color, size: 26),
+      title: Text(label, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+      selected: selected,
+      selectedTileColor: const Color(0xFFEAF5EC),
+      onTap: onTap,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+      dense: true,
+    );
+  }
+
+  Widget _studentForm() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.black26),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Add New Student', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 16),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final columns = constraints.maxWidth >= 700 ? 2 : 1;
+              final fieldWidth = columns == 2
+                  ? (constraints.maxWidth - 20) / 2
+                  : constraints.maxWidth;
+              return Wrap(
+                spacing: 20,
+                runSpacing: 14,
+                children: [
+                  _field('Name', fieldWidth),
+                  _field('Phone Number', fieldWidth),
+                  _field('Group', fieldWidth),
+                ],
+              );
+            },
           ),
-          Padding(
-            padding: const EdgeInsets.only(left: 20, top: 30,right: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Student Registry",
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 5),
-                Text(
-                  "Add and Manage Siwes Student",
-                  style: TextStyle(
-                    color: const Color.fromARGB(255, 143, 141, 141),
-                  ),
-                ),
-                SizedBox(height: 30),
-                Container(
-                  width: 1000,
-                  height: 230,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black26),
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                      left: 15,
-                      top: 20,
-                      right: 15,
-                    ),
-                    child: Column(
-                      children: [
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            "Add New Student",
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        Column(
-                          children: [
-                            Row(
-                              children: [
-                                Text(
-                                  "Name",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                SizedBox(width: 5),
-                                Container(
-                                  width: 200,
-                                  height: 30,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.black26),
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                  child: TextField(decoration: null),
-                                ),
-
-                                SizedBox(width: 40),
-
-                                Text(
-                                  "Phone Number",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                SizedBox(width: 5),
-                                Container(
-                                  width: 200,
-                                  height: 30,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.black26),
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                  child: TextField(decoration: null),
-                                ),
-                              ],
-                            ),
-
-                            SizedBox(height: 10),
-
-                            Row(
-                              children: [
-                                Text(
-                                  "Group",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                SizedBox(width: 5),
-                                Container(
-                                  width: 200,
-                                  height: 30,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.black26),
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                  child: TextField(decoration: null),
-                                ),
-                              ],
-                            ),
-
-                            // SizedBox(width: 10),
-                            // Column(
-                            //   crossAxisAlignment: CrossAxisAlignment.start,
-                            //   children: [
-                            //     Text("Schedule of Duty",style: TextStyle(fontWeight: FontWeight.bold),),
-                            //     Container(
-                            //       width: 150,
-                            //       height: 30,
-                            //       decoration: BoxDecoration(
-                            //         border: Border.all(color: Colors.black26),
-                            //         borderRadius: BorderRadius.circular(6),
-                            //       ),
-                            //        child: TextField(
-                            //         decoration: null,
-                            //       ),
-                            //     ),
-                            //   ],
-                            // ),
-                          ],
-                        ),
-                        SizedBox(height: 20),
-
-                        Row(
-                          children: [
-                            InkWell(
-                              onTap: () {},
-                              child: Container(
-                                width: 150,
-                                height: 50,
-                                padding: EdgeInsets.only(left: 18),
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.black26),
-                                  borderRadius: BorderRadius.circular(6),
-                                  color: Colors.green,
-                                ),
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.add, color: Colors.white),
-                                    Text(
-                                      "Add Student",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 15,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                SizedBox(height: 40),
-                Container(
-                  width: 1000,
-                  height: 250,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black26),
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 20, top: 20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Total Students:0"),
-                        SizedBox(height: 10),
-                        Container(
-                          width: 900,
-                          height: 50,
-                          padding: EdgeInsets.only(left: 20),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.black26),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Row(
-                            children: [
-                              Text(
-                                "S/N",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              SizedBox(width: 40),
-                              Text(
-                                "Name",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              SizedBox(width: 60),
-                              Text(
-                                "Phone Number",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              SizedBox(width: 60),
-                              Text(
-                                "Group",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              SizedBox(width: 60),
-                              Text(
-                                "Posting",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              SizedBox(width: 60),
-                              Text(
-                                "Schedule of Duty",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 40),
-                        Center(
-                          child: Icon(
-                            Icons.note_alt_outlined,
-                            size: 40,
-                            color: Colors.grey,
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        Center(
-                          child: Text(
-                            "No Records Yet",
-                            style: TextStyle(color: Colors.grey),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+          const SizedBox(height: 20),
+          SizedBox(
+            height: 44,
+            child: FilledButton.icon(
+              onPressed: () {},
+              icon: const Icon(Icons.add),
+              label: const Text('Add Student'),
+              style: FilledButton.styleFrom(backgroundColor: Colors.green),
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _field(String label, double width) {
+    return SizedBox(
+      width: width,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 6),
+          const SizedBox(
+            height: 42,
+            child: TextField(
+              decoration: InputDecoration(
+                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                border: OutlineInputBorder(),
+                isDense: true,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _studentTable() {
+    const headers = ['S/N', 'Name', 'Phone Number', 'Group', 'Posting', 'Schedule of Duty'];
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.black26),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Total Students: 0'),
+          const SizedBox(height: 12),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: SizedBox(
+              width: 820,
+              child: Column(
+                children: [
+                  Container(
+                    height: 48,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.black26),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Row(
+                      children: List.generate(headers.length, (index) => Expanded(
+                        flex: index == headers.length - 1 ? 2 : 1,
+                        child: Text(headers[index], style: const TextStyle(fontWeight: FontWeight.bold)),
+                      )),
+                    ),
+                  ),
+                  const SizedBox(height: 28),
+                  const Icon(Icons.note_alt_outlined, size: 40, color: Colors.grey),
+                  const SizedBox(height: 8),
+                  const Text('No Records Yet', style: TextStyle(color: Colors.grey)),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isWide = constraints.maxWidth >= 900;
+        return Scaffold(
+          backgroundColor: _pageColor,
+          drawer: isWide ? null : Drawer(child: _navigation(inDrawer: true)),
+          body: Row(
+            children: [
+              if (isWide) _navigation(),
+              Expanded(
+                child: SafeArea(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (!isWide)
+                        Builder(
+                          builder: (context) => IconButton(
+                            tooltip: 'Open navigation',
+                            icon: const Icon(Icons.menu),
+                            onPressed: () => Scaffold.of(context).openDrawer(),
+                          ),
+                        ),
+                      Expanded(
+                        child: SingleChildScrollView(
+                          padding: EdgeInsets.fromLTRB(isWide ? 30 : 20, isWide ? 30 : 8, isWide ? 30 : 20, 28),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('Student Registry', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                              const SizedBox(height: 5),
+                              const Text('Add and Manage SIWES Students', style: TextStyle(color: _mutedColor)),
+                              const SizedBox(height: 24),
+                              _studentForm(),
+                              const SizedBox(height: 24),
+                              _studentTable(),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
