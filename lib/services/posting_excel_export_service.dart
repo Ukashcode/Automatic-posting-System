@@ -25,7 +25,6 @@ class PostingExcelExportService {
       'Phone Number',
       'Group',
       'Posting Unit',
-      'Schedule of Duty',
     ];
     final rows = <List<String>>[
       headers,
@@ -36,7 +35,6 @@ class PostingExcelExportService {
           postings[i].student.phoneNumber,
           postings[i].student.groupName,
           postings[i].unit.name,
-          postings[i].posting.scheduleOfDuty ?? '',
         ],
     ];
 
