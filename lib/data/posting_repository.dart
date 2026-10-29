@@ -98,6 +98,17 @@ class PostingRepository {
         ),
       );
 
+  Future<void> deleteStudent(int studentId) async {
+    await _database.transaction(() async {
+      await (_database.delete(
+        _database.postings,
+      )..where((posting) => posting.studentId.equals(studentId))).go();
+      await (_database.delete(
+        _database.students,
+      )..where((student) => student.id.equals(studentId))).go();
+    });
+  }
+
   Future<void> saveUnit({int? id, required String name}) async {
     final value = name.trim();
     if (id == null) {

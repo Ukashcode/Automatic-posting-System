@@ -50,6 +50,38 @@ class _RecordState extends State<Record> {
     }
   }
 
+  Future<void> _deleteStudent(Student student) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Remove student?'),
+        content: Text(
+          'Remove ${student.name} from your records? Their current posting will also be removed.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('Remove'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    try {
+      await widget.repository.deleteStudent(student.id);
+      if (mounted) _message('${student.name} was removed from the records.');
+    } catch (_) {
+      if (mounted)
+        _message('Could not remove ${student.name}. Please try again.');
+    }
+  }
+
   void _message(String message) {
     ScaffoldMessenger.of(
       context,
@@ -196,6 +228,7 @@ class _RecordState extends State<Record> {
                       DataColumn(label: Text('Name')),
                       DataColumn(label: Text('Phone Number')),
                       DataColumn(label: Text('Group')),
+                      DataColumn(label: Text('Actions')),
                     ],
                     rows: [
                       for (var i = 0; i < students.length; i++)
@@ -205,6 +238,16 @@ class _RecordState extends State<Record> {
                             DataCell(Text(students[i].name)),
                             DataCell(Text(students[i].phoneNumber)),
                             DataCell(Text(students[i].groupName)),
+                            DataCell(
+                              IconButton(
+                                tooltip: 'Remove student',
+                                onPressed: () => _deleteStudent(students[i]),
+                                icon: const Icon(
+                                  Icons.delete_outline,
+                                  color: Colors.red,
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                     ],

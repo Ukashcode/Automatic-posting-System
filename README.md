@@ -5,7 +5,7 @@ A Flutter web application for managing SIWES student records, posting units, and
 ## Current screens
 
 - **Dashboard:** displays live student and unit totals. Generate Posting assigns students and downloads an Excel workbook of the full posting list.
-- **Student Registry:** stores a student's name, phone number, and group in SQLite.
+- **Student Registry:** stores a student's name, phone number, and group in SQLite; removing a student also removes their current posting.
 - **Posting Units:** starts with four editable units and supports adding, renaming, and deleting units without posting history.
 
 ## Posting behavior
