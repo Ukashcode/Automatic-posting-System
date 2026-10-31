@@ -61,16 +61,21 @@ class Dashboard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const Padding(
-              padding: EdgeInsets.fromLTRB(20, 20, 12, 0),
+              padding: EdgeInsets.fromLTRB(12, 18, 12, 0),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'AKTH',
-                    style: TextStyle(fontSize: 20, color: Colors.green),
+                  Image(
+                    image: AssetImage(
+                      'images/cropped-akth_logo-removebg-preview-2-1.png',
+                    ),
+                    width: 84,
+                    height: 84,
+                    fit: BoxFit.contain,
                   ),
+                  SizedBox(height: 8),
                   Text(
                     'SIWES Posting System',
+                    textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 12,
                       color: _mutedColor,
