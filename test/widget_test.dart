@@ -55,7 +55,12 @@ void main() {
   testWidgets('shows only the two supported student groups', (tester) async {
     await pumpRecord(tester);
 
-    await tester.tap(find.text('Select group'));
+    await tester.tap(
+      find.descendant(
+        of: find.byType(DropdownButtonFormField<String>),
+        matching: find.byIcon(Icons.arrow_drop_down),
+      ),
+    );
     await tester.pumpAndSettle();
 
     expect(find.text('Group A (Mon/Tue)'), findsOneWidget);
@@ -78,7 +83,12 @@ void main() {
     await tester.enterText(find.byType(TextFormField).at(0), 'Test Student');
     await tester.enterText(find.byType(TextFormField).at(1), '08000000000');
 
-    await tester.tap(find.text('Select group'));
+    await tester.tap(
+      find.descendant(
+        of: find.byType(DropdownButtonFormField<String>),
+        matching: find.byIcon(Icons.arrow_drop_down),
+      ),
+    );
     await tester.pumpAndSettle();
     await tester.tap(find.text('Group B (Wed/Thu)').last);
     await tester.pumpAndSettle();
