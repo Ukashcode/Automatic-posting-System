@@ -28,6 +28,8 @@ class Postings extends Table {
 
 @DriftDatabase(tables: [Students, PostingUnits, Postings])
 class AppDatabase extends _$AppDatabase {
+  AppDatabase.forTesting(QueryExecutor executor) : super(executor);
+
   AppDatabase()
     : super(
         driftDatabase(
