@@ -1,3 +1,4 @@
+import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -36,7 +37,7 @@ void main() {
   late _FakePostingRepository repository;
 
   setUp(() {
-    database = AppDatabase();
+    database = AppDatabase.forTesting(NativeDatabase.memory());
     repository = _FakePostingRepository(database);
   });
 
