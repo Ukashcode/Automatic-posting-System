@@ -18,30 +18,29 @@ class _RecordState extends State<Record> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
-  final _groupController = TextEditingController();
+  final _groupFieldKey = GlobalKey<FormFieldState<String>>();
   bool _saving = false;
 
   @override
   void dispose() {
     _nameController.dispose();
     _phoneController.dispose();
-    _groupController.dispose();
     super.dispose();
   }
 
   Future<void> _addStudent() async {
     if (!_formKey.currentState!.validate()) return;
+    final groupName = _groupFieldKey.currentState!.value!;
     setState(() => _saving = true);
     try {
       await widget.repository.addStudent(
         name: _nameController.text,
         phoneNumber: _phoneController.text,
-        groupName: _groupController.text,
+        groupName: groupName,
       );
       _formKey.currentState!.reset();
       _nameController.clear();
       _phoneController.clear();
-      _groupController.clear();
       _message('Student added.');
     } catch (_) {
       _message('Could not add this student.');
@@ -120,6 +119,55 @@ class _RecordState extends State<Record> {
     );
   }
 
+  Widget _groupField(double width) {
+    return SizedBox(
+      width: width,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Group', style: TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 6),
+          DropdownButtonFormField<String>(
+            key: _groupFieldKey,
+            decoration: const InputDecoration(
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 10,
+              ),
+              border: OutlineInputBorder(),
+              isDense: true,
+            ),
+            hint: const Text('Select group'),
+            items: const [
+              DropdownMenuItem(
+                value: 'A',
+                child: Text('Group A (Mon/Tue)'),
+              ),
+              DropdownMenuItem(
+                value: 'B',
+                child: Text('Group B (Wed/Thu)'),
+              ),
+            ],
+            onChanged: (_) {},
+            validator: (value) =>
+                value == null ? 'Select a group' : null,
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _displayGroup(String groupName) {
+    switch (groupName) {
+      case 'A':
+        return 'Group A';
+      case 'B':
+        return 'Group B';
+      default:
+        return groupName;
+    }
+  }
+
   Widget _studentForm() {
     return Container(
       width: double.infinity,
@@ -156,7 +204,7 @@ class _RecordState extends State<Record> {
                       width,
                       keyboardType: TextInputType.phone,
                     ),
-                    _field('Group', _groupController, width),
+                    _groupField(width),
                   ],
                 );
               },
@@ -237,7 +285,7 @@ class _RecordState extends State<Record> {
                             DataCell(Text('${i + 1}')),
                             DataCell(Text(students[i].name)),
                             DataCell(Text(students[i].phoneNumber)),
-                            DataCell(Text(students[i].groupName)),
+                            DataCell(Text(_displayGroup(students[i].groupName))),
                             DataCell(
                               IconButton(
                                 tooltip: 'Remove student',
