@@ -280,12 +280,12 @@ class PostingRepository {
     for (final group in ['A', 'B']) {
       final counts = groupCounts[group]!;
       final otherCounts = groupCounts[group == 'A' ? 'B' : 'A']!;
-      final singletonEntry = counts.entries
+      final singletonEntries = counts.entries
           .where((entry) => entry.value == 1)
-          .firstOrNull;
-      if (singletonEntry == null) continue;
+          .toList();
+      if (singletonEntries.isEmpty) continue;
 
-      final singletonUnitId = singletonEntry.key;
+      final singletonUnitId = singletonEntries.first.key;
       final targetUnit = units.firstWhere(
         (unit) =>
             unit.id != singletonUnitId &&
