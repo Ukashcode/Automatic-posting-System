@@ -122,8 +122,11 @@ class PostingRepository {
     if (value.isEmpty) throw ArgumentError('Enter a posting-unit name.');
 
     final duplicate = await (_database.select(_database.postingUnits)
-          ..where((row) => row.name.lower().equals(value.toLowerCase()))
-          ..where((row) => id == null ? const Constant(true) : row.id.isNotValue(id)))
+          ..where(
+            (row) =>
+                row.name.lower().equals(value.toLowerCase()) &
+                (id == null ? const Constant(true) : row.id.isNotValue(id)),
+          ))
         .get();
     if (duplicate.isNotEmpty) {
       throw StateError('A posting unit with this name already exists.');
