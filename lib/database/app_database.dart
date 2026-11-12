@@ -15,6 +15,7 @@ class PostingUnits extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get name => text().withLength(min: 1, max: 120).unique()();
   IntColumn get sortOrder => integer().withDefault(const Constant(0))();
+  BoolColumn get isActive => boolean().withDefault(const Constant(true))();
 }
 
 class Postings extends Table {
@@ -42,13 +43,16 @@ class AppDatabase extends _$AppDatabase {
       );
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (migrator) => migrator.createAll(),
     onUpgrade: (migrator, from, to) async {
       if (from < 2) await migrator.createAll();
+      if (from < 3) {
+        await migrator.addColumn(postingUnits, postingUnits.isActive);
+      }
     },
   );
 }
