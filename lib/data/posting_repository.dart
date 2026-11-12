@@ -274,38 +274,39 @@ class PostingRepository {
       }
     }
 
-    // If a group has an odd final student, prefer placing that student in a
-    // unit already used by the other group. This avoids leaving a unit
-    // completely unused across the combined weekly schedule.
+    // When a group has one single-student unit, move one student from a
+    // paired unit into it. This keeps the group count valid while allowing
+    // the singleton assignment to share a destination with the other group.
     for (final group in ['A', 'B']) {
       final counts = groupCounts[group]!;
       final otherCounts = groupCounts[group == 'A' ? 'B' : 'A']!;
-      final singleUnit = counts.entries
+      final singletonEntry = counts.entries
           .where((entry) => entry.value == 1)
-          .toList();
-      if (singleUnit.isEmpty) continue;
+          .firstOrNull;
+      if (singletonEntry == null) continue;
 
-      final singletonStudents = studentsByGroup[group]!
-          .where((student) => counts[assignments[student.id]] == 1)
-          .toList();
-      if (singletonStudents.isEmpty) continue;
-      final singleton = singletonStudents.last;
-
-      final currentUnitId = assignments[singleton.id]!;
-      final candidates = units
-          .where(
-            (unit) =>
-                unit.id != currentUnitId &&
-                counts[unit.id] == 0 &&
-                otherCounts[unit.id]! > 0,
-          )
-          .toList();
-      if (candidates.isNotEmpty) {
-        final target = candidates.first;
-        counts[currentUnitId] = counts[currentUnitId]! - 1;
-        counts[target.id] = counts[target.id]! + 1;
-        assignments[singleton.id] = target.id;
+      final singletonUnitId = singletonEntry.key;
+      final targetUnit = units.firstWhere(
+        (unit) =>
+            unit.id != singletonUnitId &&
+            counts[unit.id] == 2 &&
+            otherCounts[unit.id]! > 0,
+        orElse: () => units.firstWhere(
+          (unit) => unit.id != singletonUnitId && counts[unit.id] == 2,
+          orElse: () => units.first,
+        ),
+      );
+      if (targetUnit.id == singletonUnitId ||
+          counts[targetUnit.id] != 2) {
+        continue;
       }
+
+      final studentToMove = studentsByGroup[group]!.lastWhere(
+        (student) => assignments[student.id] == targetUnit.id,
+      );
+      assignments[studentToMove.id] = singletonUnitId;
+      counts[singletonUnitId] = counts[singletonUnitId]! + 1;
+      counts[targetUnit.id] = counts[targetUnit.id]! - 1;
     }
 
     final batchId = DateTime.now().microsecondsSinceEpoch;
