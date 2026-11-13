@@ -25,6 +25,8 @@ class Postings extends Table {
   IntColumn get batchId => integer()();
   TextColumn get scheduleOfDuty => text().nullable()();
   DateTimeColumn get postedAt => dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get periodStartDate => dateTime().nullable()();
+  DateTimeColumn get periodEndDate => dateTime().nullable()();
 }
 
 @DriftDatabase(tables: [Students, PostingUnits, Postings])
@@ -43,7 +45,7 @@ class AppDatabase extends _$AppDatabase {
       );
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -52,6 +54,10 @@ class AppDatabase extends _$AppDatabase {
       if (from < 2) await migrator.createAll();
       if (from < 3) {
         await migrator.addColumn(postingUnits, postingUnits.isActive);
+      }
+      if (from < 4) {
+        await migrator.addColumn(postings, postings.periodStartDate);
+        await migrator.addColumn(postings, postings.periodEndDate);
       }
     },
   );
