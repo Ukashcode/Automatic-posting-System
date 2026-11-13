@@ -61,55 +61,60 @@ class _DashboardState extends State<Dashboard> {
       ),
     );
   }
+
   Widget _navigation(BuildContext context, {bool inDrawer = false}) {
-    return Container(
-      width: inDrawer ? null : 200,
+    // ListTile paints its selected background and ink on the nearest Material.
+    // Keeping Material here prevents an intermediate ColoredBox hiding them.
+    return Material(
       color: Colors.white,
-      child: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Padding(
-              padding: EdgeInsets.fromLTRB(12, 18, 12, 0),
-              child: Column(
-                children: [
-                  Image(
-                    image: AssetImage(
-                      'images/cropped-akth_logo-removebg-preview-2-1.png',
+      child: SizedBox(
+        width: inDrawer ? null : 200,
+        child: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Padding(
+                padding: EdgeInsets.fromLTRB(12, 18, 12, 0),
+                child: Column(
+                  children: [
+                    Image(
+                      image: AssetImage(
+                        'images/cropped-akth_logo-removebg-preview-2-1.png',
+                      ),
+                      width: 84,
+                      height: 84,
+                      fit: BoxFit.contain,
                     ),
-                    width: 84,
-                    height: 84,
-                    fit: BoxFit.contain,
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    'SIWES Posting System',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: _mutedColor,
-                      fontWeight: FontWeight.bold,
+                    SizedBox(height: 8),
+                    Text(
+                      'SIWES Posting System',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: _mutedColor,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 36),
-            _navItem(Icons.dashboard_outlined, 'Dashboard', selected: true),
-            _navItem(
-              Icons.people_outline,
-              'Record',
-              onTap: () => _openRecords(context),
-            ),
-            _navItem(
-              Icons.business_outlined,
-              'Posting Units',
-              onTap: () => _openUnits(context),
-            ),
-            const Spacer(),
-            _navItem(Icons.logout, 'Logout', color: Colors.red),
-            const SizedBox(height: 20),
-          ],
+              const SizedBox(height: 36),
+              _navItem(Icons.dashboard_outlined, 'Dashboard', selected: true),
+              _navItem(
+                Icons.people_outline,
+                'Record',
+                onTap: () => _openRecords(context),
+              ),
+              _navItem(
+                Icons.business_outlined,
+                'Posting Units',
+                onTap: () => _openUnits(context),
+              ),
+              const Spacer(),
+              _navItem(Icons.logout, 'Logout', color: Colors.red),
+              const SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
     );
@@ -246,15 +251,23 @@ class _DashboardState extends State<Dashboard> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Posting period', style: TextStyle(fontWeight: FontWeight.bold)),
+                    const Text(
+                      'Posting period',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                     const SizedBox(height: 6),
                     Text(
                       PostingPeriod.formatDate(_selectedStartDate) + '  -  ' +
-                          PostingPeriod.formatDate(PostingPeriod.calculateEndDate(_selectedStartDate)),
+                          PostingPeriod.formatDate(
+                            PostingPeriod.calculateEndDate(_selectedStartDate),
+                          ),
                       style: const TextStyle(color: _mutedColor),
                     ),
                     const SizedBox(height: 4),
-                    const Text('10 working days • Weekends excluded; public holidays still count', style: TextStyle(fontSize: 12, color: _mutedColor)),
+                    const Text(
+                      '10 working days • Weekends excluded; public holidays still count',
+                      style: TextStyle(fontSize: 12, color: _mutedColor),
+                    ),
                   ],
                 ),
                 OutlinedButton.icon(

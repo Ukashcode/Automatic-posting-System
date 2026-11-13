@@ -15,10 +15,12 @@ class Record extends StatefulWidget {
 class _RecordState extends State<Record> {
   static const Color _pageColor = Color(0xFFF8F8F8);
   static const Color _mutedColor = Color(0xFF8F8D8D);
+
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
-  final _groupFieldKey = GlobalKey<FormFieldState<String>>();
+
+  String? _selectedGroup;
   bool _saving = false;
 
   @override
@@ -30,7 +32,10 @@ class _RecordState extends State<Record> {
 
   Future<void> _addStudent() async {
     if (!_formKey.currentState!.validate()) return;
-    final groupName = _groupFieldKey.currentState!.value!;
+
+    final groupName = _selectedGroup;
+    if (groupName == null) return;
+
     setState(() => _saving = true);
     try {
       await widget.repository.addStudent(
@@ -38,12 +43,17 @@ class _RecordState extends State<Record> {
         phoneNumber: _phoneController.text,
         groupName: groupName,
       );
+
+      // The user may have left this page while the database write was running.
+      if (!mounted) return;
+
       _formKey.currentState!.reset();
       _nameController.clear();
       _phoneController.clear();
+      setState(() => _selectedGroup = null);
       _message('Student added.');
     } catch (_) {
-      _message('Could not add this student.');
+      if (mounted) _message('Could not add this student.');
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -74,17 +84,21 @@ class _RecordState extends State<Record> {
 
     try {
       await widget.repository.deleteStudent(student.id);
-      if (mounted) _message('${student.name} was removed from the records.');
+      if (mounted) {
+        _message('${student.name} was removed from the records.');
+      }
     } catch (_) {
-      if (mounted)
+      if (mounted) {
         _message('Could not remove ${student.name}. Please try again.');
+      }
     }
   }
 
   void _message(String message) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
   }
 
   Widget _field(
@@ -128,7 +142,7 @@ class _RecordState extends State<Record> {
           const Text('Group', style: TextStyle(fontWeight: FontWeight.bold)),
           const SizedBox(height: 6),
           DropdownButtonFormField<String>(
-            key: _groupFieldKey,
+            initialValue: null,
             decoration: const InputDecoration(
               contentPadding: EdgeInsets.symmetric(
                 horizontal: 12,
@@ -148,7 +162,7 @@ class _RecordState extends State<Record> {
                 child: Text('Group B (Wed/Thu)'),
               ),
             ],
-            onChanged: (_) {},
+            onChanged: (value) => setState(() => _selectedGroup = value),
             validator: (value) =>
                 value == null ? 'Select a group' : null,
           ),
@@ -229,10 +243,13 @@ class _RecordState extends State<Record> {
     return StreamBuilder<List<Student>>(
       stream: widget.repository.watchStudents(),
       builder: (context, snapshot) {
-        if (snapshot.hasError)
+        if (snapshot.hasError) {
           return const Text('Unable to load student records.');
-        if (!snapshot.hasData)
+        }
+        if (!snapshot.hasData) {
           return const Center(child: CircularProgressIndicator());
+        }
+
         final students = snapshot.data!;
         return Container(
           width: double.infinity,
