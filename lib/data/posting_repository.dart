@@ -263,7 +263,7 @@ class PostingRepository {
     return preview.length;
   }
 
-}}
+}
 
 class PostingPreviewItem {
   const PostingPreviewItem({required this.student, required this.unit});
