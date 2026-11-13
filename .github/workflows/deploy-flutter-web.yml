@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - feature/dynamic-posting-management
+      - feature/posting-preview-date-exports
   pull_request:
     branches:
       - main
