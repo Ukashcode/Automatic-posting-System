@@ -4,21 +4,30 @@ import 'dart:html' as html;
 import 'dart:typed_data';
 
 import '../data/posting_repository.dart';
+import '../utils/posting_period.dart';
 
 class PostingExcelExportService {
-  void download(List<PostingView> postings) {
-    final bytes = _workbookBytes(postings);
+  void download(
+    List<PostingPreviewItem> postings, {
+    required DateTime periodStartDate,
+    required DateTime periodEndDate,
+  }) {
+    final bytes = _workbookBytes(postings, periodStartDate, periodEndDate);
     final blob = html.Blob([
       bytes,
     ], 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     final url = html.Url.createObjectUrlFromBlob(blob);
     html.AnchorElement(href: url)
-      ..download = 'AKTH_SIWES_Postings.xlsx'
+      ..download = 'AKTH_SIWES_Posting_' + PostingPeriod.fileDate(periodStartDate) + '_to_' + PostingPeriod.fileDate(periodEndDate) + '.xlsx'
       ..click();
     Timer(const Duration(seconds: 1), () => html.Url.revokeObjectUrl(url));
   }
 
-  Uint8List _workbookBytes(List<PostingView> postings) {
+  Uint8List _workbookBytes(
+    List<PostingPreviewItem> postings,
+    DateTime periodStartDate,
+    DateTime periodEndDate,
+  ) {
     const headers = [
       'S/N',
       'Student Name',
@@ -27,6 +36,9 @@ class PostingExcelExportService {
       'Posting Unit',
     ];
     final rows = <List<String>>[
+      ['DIGITAL HEALTH DEPARTMENT'],
+      ['POSTING OF SIWES STUDENTS EFFECTIVE FROM ' + PostingPeriod.formatDate(periodStartDate) + ' TO ' + PostingPeriod.formatDate(periodEndDate)],
+      [],
       headers,
       for (var i = 0; i < postings.length; i++)
         [
