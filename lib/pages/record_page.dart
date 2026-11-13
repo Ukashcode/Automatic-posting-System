@@ -125,8 +125,6 @@ class _RecordState extends State<Record> {
               border: OutlineInputBorder(),
               isDense: true,
             ),
-            validator: (value) =>
-                value == null || value.trim().isEmpty ? 'Required' : null,
           ),
         ],
       ),
@@ -211,9 +209,9 @@ class _RecordState extends State<Record> {
                   spacing: 20,
                   runSpacing: 14,
                   children: [
-                    _field('Name', _nameController, width),
+                    _field('Name (optional)', _nameController, width),
                     _field(
-                      'Phone Number',
+                      'Phone Number (optional)',
                       _phoneController,
                       width,
                       keyboardType: TextInputType.phone,
