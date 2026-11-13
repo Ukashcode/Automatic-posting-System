@@ -173,10 +173,17 @@ class PostingRepository {
       final singletons = counts.entries.where((entry) => entry.value == 1).toList();
       if (singletons.isEmpty) continue;
       final singletonId = singletons.first.key;
-      final candidates = units.where((unit) => unit.id != singletonId && counts[unit.id] == 2).toList();
-      if (candidates.isEmpty) continue;
-      candidates.sort((a, b) => (other[b.id]! > 0 ? 1 : 0).compareTo(other[a.id]! > 0 ? 1 : 0));
-      final target = candidates.first;
+      final target = units.firstWhere(
+        (unit) =>
+            unit.id != singletonId &&
+            counts[unit.id] == 2 &&
+            other[unit.id]! > 0,
+        orElse: () => units.firstWhere(
+          (unit) => unit.id != singletonId && counts[unit.id] == 2,
+          orElse: () => units.first,
+        ),
+      );
+      if (target.id == singletonId || counts[target.id] != 2) continue;
       final move = byGroup[group]!.lastWhere((student) => assignments[student.id] == target.id);
       assignments[move.id] = singletonId;
       counts[singletonId] = counts[singletonId]! + 1;
