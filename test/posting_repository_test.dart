@@ -135,4 +135,27 @@ void main() {
     expect(await repository.getPostingsForExport(), isEmpty);
   });
 
+  test('preview does not advance an existing posting until confirmed', () async {
+    await addUnits(2);
+    await addStudents('A', 1);
+
+    await repository.generateBalancedPostings();
+    final beforePreview = await repository.getPostingsForExport();
+    expect(beforePreview.single.unit.name, 'Unit 1');
+
+    final preview = await repository.buildPostingPreview();
+    expect(preview.single.unit.name, 'Unit 2');
+
+    final afterPreview = await repository.getPostingsForExport();
+    expect(afterPreview.single.unit.name, 'Unit 1');
+
+    await repository.confirmPostingPreview(
+      preview: preview,
+      periodStartDate: DateTime(2026, 11, 2),
+      periodEndDate: DateTime(2026, 11, 13),
+    );
+    final afterConfirmation = await repository.getPostingsForExport();
+    expect(afterConfirmation.single.unit.name, 'Unit 2');
+  });
+
 }
