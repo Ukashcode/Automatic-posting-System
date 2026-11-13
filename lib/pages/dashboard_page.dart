@@ -254,7 +254,7 @@ class _DashboardState extends State<Dashboard> {
                       style: const TextStyle(color: _mutedColor),
                     ),
                     const SizedBox(height: 4),
-                    const Text('10 working days • Weekends excluded', style: TextStyle(fontSize: 12, color: _mutedColor)),
+                    const Text('10 working days • Weekends excluded; public holidays still count', style: TextStyle(fontSize: 12, color: _mutedColor)),
                   ],
                 ),
                 OutlinedButton.icon(
