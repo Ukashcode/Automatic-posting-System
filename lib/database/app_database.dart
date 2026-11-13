@@ -5,8 +5,8 @@ part 'app_database.g.dart';
 
 class Students extends Table {
   IntColumn get id => integer().autoIncrement()();
-  TextColumn get name => text().withLength(min: 1, max: 120)();
-  TextColumn get phoneNumber => text().withLength(min: 1, max: 30)();
+  TextColumn get name => text().withLength(min: 0, max: 120)();
+  TextColumn get phoneNumber => text().withLength(min: 0, max: 30)();
   TextColumn get groupName => text().withLength(min: 1, max: 80)();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 }
@@ -45,7 +45,7 @@ class AppDatabase extends _$AppDatabase {
       );
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -58,6 +58,23 @@ class AppDatabase extends _$AppDatabase {
       if (from < 4) {
         await migrator.addColumn(postings, postings.periodStartDate);
         await migrator.addColumn(postings, postings.periodEndDate);
+      }
+      if (from < 5) {
+        // Rebuild the students table so existing databases accept empty
+        // strings for optional names and phone numbers without losing rows.
+        await customStatement('PRAGMA foreign_keys = OFF');
+        try {
+          await migrator.alterTable(TableMigration(students));
+        } finally {
+          await customStatement('PRAGMA foreign_keys = ON');
+        }
+
+        final foreignKeyViolations = await customSelect(
+          'PRAGMA foreign_key_check',
+        ).get();
+        if (foreignKeyViolations.isNotEmpty) {
+          throw StateError('Student details migration caused foreign-key violations.');
+        }
       }
     },
   );
