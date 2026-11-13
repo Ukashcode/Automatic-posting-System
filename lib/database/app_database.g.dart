@@ -28,7 +28,7 @@ class $StudentsTable extends Students with TableInfo<$StudentsTable, Student> {
     aliasedName,
     false,
     additionalChecks: GeneratedColumn.checkTextLength(
-      minTextLength: 1,
+      minTextLength: 0,
       maxTextLength: 120,
     ),
     type: DriftSqlType.string,
@@ -43,7 +43,7 @@ class $StudentsTable extends Students with TableInfo<$StudentsTable, Student> {
     aliasedName,
     false,
     additionalChecks: GeneratedColumn.checkTextLength(
-      minTextLength: 1,
+      minTextLength: 0,
       maxTextLength: 30,
     ),
     type: DriftSqlType.string,
