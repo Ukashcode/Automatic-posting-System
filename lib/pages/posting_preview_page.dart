@@ -196,11 +196,6 @@ class _PostingPreviewPageState extends State<PostingPreviewPage> {
                                     ),
                                   ),
                                 ),
-                                const SizedBox(height: 12),
-                                const Text(
-                                  'Review the assignments and dates before confirming. The preview does not change saved postings.',
-                                  style: TextStyle(fontSize: 12, color: Colors.black54),
-                                ),
                               ],
                             ),
                           ),
