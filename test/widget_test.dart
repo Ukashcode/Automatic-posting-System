@@ -11,9 +11,13 @@ class _FakePostingRepository extends PostingRepository {
   _FakePostingRepository(super.database);
 
   final List<Map<String, String>> addedStudents = [];
+  List<PostingUnit> unitsToShow = [];
 
   @override
   Stream<List<Student>> watchStudents() => Stream.value([]);
+
+  @override
+  Stream<List<PostingUnit>> watchUnits() => Stream.value(unitsToShow);
 
   @override
   Future<int> addStudent({
@@ -113,7 +117,9 @@ void main() {
       addTearDown(tester.view.resetDevicePixelRatio);
 
       const unitName = 'Health Information Management and Records';
-      await repository.saveUnit(name: unitName);
+      repository.unitsToShow = [
+        PostingUnit(id: 1, name: unitName, sortOrder: 0),
+      ];
 
       await tester.pumpWidget(
         MaterialApp(home: UnitsPage(repository: repository)),
