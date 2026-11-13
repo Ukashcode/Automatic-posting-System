@@ -49,3 +49,18 @@ After pulling this branch, regenerate Drift's generated file before running the 
 dart run build_runner build --delete-conflicting-outputs
 flutter test
 ```
+
+
+## Preview, confirmation, and export workflow
+
+The dashboard lets the coordinator select a weekday start date. The end date is calculated as the tenth working day, counting the start date and skipping Saturday and Sunday. Public holidays are not currently excluded.
+
+Selecting **Preview Posting** runs the allocation algorithm without writing to the database. The preview displays the proposed assignments and effective dates. It does not advance students or change their saved postings.
+
+When the coordinator confirms the preview, the application verifies that the student and posting-unit records have not changed, then saves the reviewed assignments and period dates in one database transaction.
+
+After confirmation, the same reviewed assignment list can be exported separately as:
+- **Excel:** an editable workbook for administrative use. Changes made to the downloaded workbook do not update the application database or the PDF.
+- **PDF:** a print-ready document with the Digital Health Department heading, effective dates, and student posting table.
+
+The current posting period dates are stored on each student's current posting. This is not a posting-history feature; a later confirmed generation replaces the student's current assignment and period.
