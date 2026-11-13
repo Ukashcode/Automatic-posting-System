@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:akth_posting_web/data/posting_repository.dart';
 import 'package:akth_posting_web/database/app_database.dart';
 import 'package:akth_posting_web/pages/record_page.dart';
+import 'package:akth_posting_web/pages/units_page.dart';
 
 class _FakePostingRepository extends PostingRepository {
   _FakePostingRepository(super.database);
@@ -102,4 +103,29 @@ void main() {
     expect(repository.addedStudents.single['phoneNumber'], '08000000000');
     expect(repository.addedStudents.single['groupName'], 'B');
   });
+
+  testWidgets(
+    'keeps posting unit text readable beside actions on narrow screens',
+    (tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      const unitName = 'Health Information Management and Records';
+      await repository.saveUnit(name: unitName);
+
+      await tester.pumpWidget(
+        MaterialApp(home: UnitsPage(repository: repository)),
+      );
+      await tester.pumpAndSettle();
+
+      final unitNameFinder = find.text(unitName);
+      expect(unitNameFinder, findsOneWidget);
+      expect(tester.getSize(unitNameFinder).width, greaterThan(150));
+      expect(find.byTooltip('Edit unit'), findsOneWidget);
+      expect(find.byTooltip('Delete unit'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
 }

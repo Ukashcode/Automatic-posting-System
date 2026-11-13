@@ -84,6 +84,102 @@ class _UnitsPageState extends State<UnitsPage> {
     );
   }
 
+  Widget _unitCard(PostingUnit unit) {
+    final leading = CircleAvatar(
+      backgroundColor:
+          unit.isActive ? Colors.green.shade50 : Colors.grey.shade200,
+      child: Icon(
+        Icons.business_outlined,
+        color: unit.isActive ? Colors.green : Colors.grey,
+      ),
+    );
+
+    final details = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          unit.name,
+          softWrap: true,
+          style: const TextStyle(fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          unit.isActive
+              ? 'Accepting students'
+              : 'Not available for new postings',
+          softWrap: true,
+        ),
+      ],
+    );
+
+    final actions = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Switch(
+          value: unit.isActive,
+          onChanged: (value) => _setAvailability(unit, value),
+        ),
+        IconButton(
+          tooltip: 'Edit unit',
+          onPressed: () => _editUnit(unit: unit),
+          icon: const Icon(Icons.edit_outlined),
+        ),
+        IconButton(
+          tooltip: 'Delete unit',
+          onPressed: () => _deleteUnit(unit),
+          icon: const Icon(
+            Icons.delete_outline,
+            color: Colors.red,
+          ),
+        ),
+      ],
+    );
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isCompact = constraints.maxWidth < 560;
+
+        return Card(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 12,
+            ),
+            child: isCompact
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          leading,
+                          const SizedBox(width: 12),
+                          Expanded(child: details),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: actions,
+                      ),
+                    ],
+                  )
+                : Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      leading,
+                      const SizedBox(width: 12),
+                      Expanded(child: details),
+                      actions,
+                    ],
+                  ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -122,53 +218,7 @@ class _UnitsPageState extends State<UnitsPage> {
             padding: const EdgeInsets.fromLTRB(24, 24, 24, 96),
             itemCount: units.length,
             separatorBuilder: (_, __) => const SizedBox(height: 12),
-            itemBuilder: (context, index) {
-              final unit = units[index];
-              return Card(
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: unit.isActive
-                        ? Colors.green.shade50
-                        : Colors.grey.shade200,
-                    child: Icon(
-                      Icons.business_outlined,
-                      color: unit.isActive ? Colors.green : Colors.grey,
-                    ),
-                  ),
-                  title: Text(
-                    unit.name,
-                    style: const TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                  subtitle: Text(
-                    unit.isActive
-                        ? 'Accepting students'
-                        : 'Not available for new postings',
-                  ),
-                  trailing: Wrap(
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    children: [
-                      Switch(
-                        value: unit.isActive,
-                        onChanged: (value) => _setAvailability(unit, value),
-                      ),
-                      IconButton(
-                        tooltip: 'Edit unit',
-                        onPressed: () => _editUnit(unit: unit),
-                        icon: const Icon(Icons.edit_outlined),
-                      ),
-                      IconButton(
-                        tooltip: 'Delete unit',
-                        onPressed: () => _deleteUnit(unit),
-                        icon: const Icon(
-                          Icons.delete_outline,
-                          color: Colors.red,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
+            itemBuilder: (context, index) => _unitCard(units[index]),
           );
         },
       ),
