@@ -209,9 +209,9 @@ class _RecordState extends State<Record> {
                   spacing: 20,
                   runSpacing: 14,
                   children: [
-                    _field('Name (optional)', _nameController, width),
+                    _field('Name', _nameController, width),
                     _field(
-                      'Phone Number (optional)',
+                      'Phone Number',
                       _phoneController,
                       width,
                       keyboardType: TextInputType.phone,
