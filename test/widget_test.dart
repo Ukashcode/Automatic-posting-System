@@ -118,7 +118,7 @@ void main() {
 
       const unitName = 'Health Information Management and Records';
       repository.unitsToShow = [
-        PostingUnit(id: 1, name: unitName, sortOrder: 0),
+        PostingUnit(id: 1, name: unitName, sortOrder: 0, isActive: true),
       ];
 
       await tester.pumpWidget(
