@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 
 import '../database/app_database.dart';
+import '../utils/posting_period.dart';
 
 class PostingRepository {
   PostingRepository(this._database);
@@ -192,7 +193,7 @@ class PostingRepository {
     required DateTime periodEndDate,
   }) async {
     if (preview.isEmpty) throw StateError('There are no students to confirm.');
-    if (periodStartDate.weekday > DateTime.friday || periodStartDate.weekday < DateTime.monday) {
+    if (!PostingPeriod.isWeekday(periodStartDate)) {
       throw ArgumentError('Posting must start on a weekday.');
     }
     final currentStudents = await (_database.select(_database.students)..orderBy([(row) => OrderingTerm.asc(row.id)])).get();
@@ -212,7 +213,7 @@ class PostingRepository {
         throw StateError('Posting units changed. Create the preview again before confirming.');
       }
     }
-    final calculatedEnd = _workingDayEnd(periodStartDate);
+    final calculatedEnd = PostingPeriod.calculateEndDate(periodStartDate);
     if (periodEndDate.year != calculatedEnd.year || periodEndDate.month != calculatedEnd.month || periodEndDate.day != calculatedEnd.day) {
       throw ArgumentError('The end date must be the tenth working day after the selected start date.');
     }
@@ -262,16 +263,7 @@ class PostingRepository {
     return preview.length;
   }
 
-  DateTime _workingDayEnd(DateTime start) {
-    var date = DateTime(start.year, start.month, start.day);
-    var days = 1;
-    while (days < 10) {
-      date = date.add(const Duration(days: 1));
-      if (date.weekday <= DateTime.friday) days++;
-    }
-    return date;
-  }
-}
+}}
 
 class PostingPreviewItem {
   const PostingPreviewItem({required this.student, required this.unit});
