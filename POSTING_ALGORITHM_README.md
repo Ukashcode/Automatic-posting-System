@@ -1,50 +1,51 @@
 # AKTH SIWES Posting Algorithm
 
-This file explains how **Generate Posting** assigns SIWES students to posting units in the AKTH web application.
-
-## Goal
-
-Distribute students as evenly as possible across the available units, while advancing existing students when the user starts another generation. The advance happens on each button click; it is not tied to a two-week calendar.
+This document describes the current group-aware posting behaviour on the dynamic posting-management feature branch.
 
 ## Rules
 
-1. The app loads students in the order they were added and units in their configured order.
-2. It checks that there is at least one student and one unit.
-3. For each student with an existing assignment, it advances the student to the next unit in the configured order. The last unit wraps around to the first.
-4. For each newly registered student, it chooses the unit with the fewest planned assignments in this generation. Ties go to the first unit in the configured order.
-5. It updates the counts as new students are assigned.
-6. It saves all changes in one transaction and downloads an Excel file containing every student's current assignment.
+1. Students are processed in the order they were registered.
+2. Only active posting units are eligible for a new generation.
+3. Group A and Group B are assigned independently.
+4. A unit can receive at most two students from Group A and two from Group B in one generation.
+5. Required capacity is calculated separately for each group: `ceil(group student count / 2)` active units are needed.
+6. If either group needs more units than are active, generation stops before changing any assignment and explains the shortage.
+7. If a group has one single-student unit, the allocator tries to move one student from a paired unit so the single-student assignment shares a destination with the other group where possible.
+8. Existing students advance from their previous unit to the next active unit in configured order. If their previous unit is no longer active, they restart from the first active unit.
+9. New students are distributed across the active units while respecting the per-group limit.
+10. All current assignments for a generation are saved in one database transaction.
 
-The initial unit list contains **Unit 1**, **Unit 2**, **Unit 3**, and **Unit 4**. Unit names can be changed, and additional units can be added. Renaming a unit does not change its order. New units are appended after the current units.
+## Unit availability
 
-## Worked example
+Posting units have an `isActive` flag. Existing databases are migrated so previously registered units remain active by default.
 
-Suppose there are four units in the order Unit 1, Unit 2, Unit 3, Unit 4. A student currently assigned to Unit 2 moves to Unit 3 on the next click. A student assigned to Unit 4 moves to Unit 1. After existing students advance, newly registered students are placed in whichever destination has the fewest assignments.
+- Active: eligible for future generations.
+- Inactive: unavailable for future generations, but retained in the database.
+- Delete: allowed only when the unit has no posting records. Units with posting records should be marked inactive instead so the unit name remains available to existing assignments.
 
-For example, if the planned destination totals for new students are:
+The dashboard's available-unit count includes active units only.
 
-| Unit | Planned assignments |
-| --- | ---: |
-| Unit 1 | 3 |
-| Unit 2 | 2 |
-| Unit 3 | 2 |
-| Unit 4 | 1 |
+## Capacity examples
 
-The next new student goes to Unit 4 because it has the fewest planned assignments. Its total becomes 2. The next new student sees Units 2, 3, and 4 tied at 2, so Unit 2 is selected because it comes first in the configured order. Counts update after every assignment.
+With 11 active units, each group can accommodate up to 22 students. With 12 active units, each group can accommodate up to 24 students.
 
-## Persistence and repeat runs
+For 23 Group A students and 22 Group B students, 12 active units are required. The maximum remains two students per group per unit.
 
-- Assignments are written to SQLite through Drift.
-- Each generation run replaces the current unit assignment for existing students and stores a new batch identifier and posting time.
-- All assignments from one run are saved in a database transaction. If a write fails, the transaction prevents a partially saved batch.
-- Each student has one current posting. Re-running generation advances current postings rather than creating duplicate rows.
-- A unit with a current posting cannot be deleted.
-- An optional schedule-of-duty value can be stored with an assignment; the current Generate Posting screen does not ask for one.
+## Persistence and history limitation
 
-## What affects the assignment
-
-Existing students' next assignments depend on their current unit and the configured order. New students' assignments depend on the planned unit counts and unit order. The algorithm does not use a student's group, phone number, preferences, qualifications, or unit capacity. It has no time-based two-week schedule. Each click advances assignments to the next unit.
+The current database stores one current assignment per student. Each generation updates that assignment and its batch identifier; it does not yet retain a separate immutable record for every historical generation. Unit deactivation preserves the unit row and current assignments, but a full generation-history feature is still a separate planned change.
 
 ## Implementation
 
-The assignment logic is in `lib/data/posting_repository.dart`, in `generateBalancedPostings`. The SQLite tables are declared in `lib/database/app_database.dart`. The Dashboard calls the repository when the user selects **Generate Posting**.
+- Database schema and migration: `lib/database/app_database.dart`
+- Assignment and capacity logic: `lib/data/posting_repository.dart`
+- Unit availability controls: `lib/pages/units_page.dart`
+- Active-unit dashboard count: `lib/pages/dashboard_page.dart`
+- Repository tests: `test/posting_repository_test.dart`
+
+After pulling this branch, regenerate Drift's generated file before running the tests:
+
+```bash
+dart run build_runner build --delete-conflicting-outputs
+flutter test
+```

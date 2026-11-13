@@ -186,7 +186,7 @@ class Dashboard extends StatelessWidget {
             stream: repository.watchStudents(),
             builder: (context, studentsSnapshot) =>
                 StreamBuilder<List<PostingUnit>>(
-                  stream: repository.watchUnits(),
+                  stream: repository.watchActiveUnits(),
                   builder: (context, unitsSnapshot) => LayoutBuilder(
                     builder: (context, constraints) {
                       final columns = constraints.maxWidth >= 620 ? 2 : 1;
