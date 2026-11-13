@@ -33,6 +33,22 @@ void main() {
     }
   }
 
+  test('stores empty strings when student name and phone are omitted', () async {
+    final studentId = await repository.addStudent(
+      name: '   ',
+      phoneNumber: '   ',
+      groupName: 'A',
+    );
+
+    final student = await (database.select(database.students)
+          ..where((row) => row.id.equals(studentId)))
+        .getSingle();
+
+    expect(student.name, '');
+    expect(student.phoneNumber, '');
+    expect(student.groupName, 'A');
+  });
+
   test('allocates each group independently and respects two-per-unit limit', () async {
     await addUnits(2);
     await addStudents('A', 3);
