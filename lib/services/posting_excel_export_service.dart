@@ -30,10 +30,10 @@ class PostingExcelExportService {
   ) {
     const headers = [
       'S/N',
-      'Student Name',
+      'Name',
       'Phone Number',
       'Group',
-      'Posting Unit',
+      'Posting',
     ];
     final rows = <List<String>>[
       ['DIGITAL HEALTH DEPARTMENT'],
