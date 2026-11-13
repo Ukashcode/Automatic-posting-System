@@ -3,13 +3,21 @@ import 'package:akth_posting_web/pages/record_page.dart';
 import 'package:akth_posting_web/pages/units_page.dart';
 import 'package:akth_posting_web/data/posting_repository.dart';
 import 'package:akth_posting_web/database/app_database.dart';
-import 'package:akth_posting_web/services/posting_excel_export_service.dart';
+import 'package:akth_posting_web/pages/posting_preview_page.dart';
+import 'package:akth_posting_web/utils/posting_period.dart';
 
-class Dashboard extends StatelessWidget {
+class Dashboard extends StatefulWidget {
   const Dashboard({super.key, required this.repository});
 
   final PostingRepository repository;
-  static final _excelExport = PostingExcelExportService();
+
+  @override
+  State<Dashboard> createState() => _DashboardState();
+}
+
+class _DashboardState extends State<Dashboard> {
+  PostingRepository get repository => widget.repository;
+  DateTime _selectedStartDate = PostingPeriod.nextWeekday(DateTime.now());
 
   static const Color _pageColor = Color.fromRGBO(248, 248, 248, 1);
   static const Color _mutedColor = Color.fromARGB(255, 143, 141, 141);
@@ -28,30 +36,31 @@ class Dashboard extends StatelessWidget {
     );
   }
 
-  Future<void> _generatePostings(BuildContext context) async {
-    String message;
-    try {
-      final count = await repository.generateBalancedPostings();
-      final postings = await repository.getPostingsForExport();
-      if (postings.isEmpty) {
-        message = 'There are no postings to export.';
-      } else {
-        _excelExport.download(postings);
-        message =
-            'Updated postings for $count students and downloaded the Excel file.';
-      }
-    } on StateError catch (error) {
-      message = error.message;
-    } catch (_) {
-      message = 'Could not generate postings. Please try again.';
-    }
-    if (context.mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(message)));
+  Future<void> _chooseStartDate() async {
+    final selected = await showDatePicker(
+      context: context,
+      initialDate: _selectedStartDate,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2100),
+      selectableDayPredicate: PostingPeriod.isWeekday,
+      helpText: 'Select posting start date',
+    );
+    if (selected != null && mounted) {
+      setState(() => _selectedStartDate = selected);
     }
   }
 
+  void _openPostingPreview() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => PostingPreviewPage(
+          repository: repository,
+          periodStartDate: _selectedStartDate,
+        ),
+      ),
+    );
+  }
   Widget _navigation(BuildContext context, {bool inDrawer = false}) {
     return Container(
       width: inDrawer ? null : 200,
@@ -220,10 +229,47 @@ class Dashboard extends StatelessWidget {
                 ),
           ),
           const SizedBox(height: 24),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(color: Colors.black12),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 16,
+              runSpacing: 12,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Posting period', style: TextStyle(fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 6),
+                    Text(
+                      PostingPeriod.formatDate(_selectedStartDate) + '  -  ' +
+                          PostingPeriod.formatDate(PostingPeriod.calculateEndDate(_selectedStartDate)),
+                      style: const TextStyle(color: _mutedColor),
+                    ),
+                    const SizedBox(height: 4),
+                    const Text('10 working days • Weekends excluded', style: TextStyle(fontSize: 12, color: _mutedColor)),
+                  ],
+                ),
+                OutlinedButton.icon(
+                  onPressed: _chooseStartDate,
+                  icon: const Icon(Icons.calendar_month_outlined),
+                  label: const Text('Change start date'),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
           FilledButton.icon(
-            onPressed: () => _generatePostings(context),
-            icon: const Icon(Icons.auto_awesome_outlined),
-            label: const Text('Generate Posting'),
+            onPressed: _openPostingPreview,
+            icon: const Icon(Icons.preview_outlined),
+            label: const Text('Preview Posting'),
             style: FilledButton.styleFrom(
               backgroundColor: Colors.green,
               minimumSize: const Size(0, 48),
