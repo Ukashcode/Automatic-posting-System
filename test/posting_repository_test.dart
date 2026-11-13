@@ -90,4 +90,49 @@ void main() {
 
     expect(await repository.getPostingsForExport(), isEmpty);
   });
+  test('preview is read-only and confirmation saves the selected dates', () async {
+    await addUnits(2);
+    await addStudents('A', 3);
+
+    final preview = await repository.buildPostingPreview();
+    expect(preview, hasLength(3));
+    expect(await repository.getPostingsForExport(), isEmpty);
+
+    final start = DateTime(2026, 11, 2);
+    final end = DateTime(2026, 11, 13);
+    await repository.confirmPostingPreview(
+      preview: preview,
+      periodStartDate: start,
+      periodEndDate: end,
+    );
+
+    final saved = await repository.getPostingsForExport();
+    expect(saved, hasLength(3));
+    for (final item in saved) {
+      expect(item.posting.periodStartDate, start);
+      expect(item.posting.periodEndDate, end);
+    }
+  });
+
+  test('confirmation rejects a preview after student records change', () async {
+    await addUnits(2);
+    await addStudents('A', 2);
+    final preview = await repository.buildPostingPreview();
+    await repository.addStudent(
+      name: 'Added after preview',
+      phoneNumber: '08000000000',
+      groupName: 'A',
+    );
+
+    await expectLater(
+      repository.confirmPostingPreview(
+        preview: preview,
+        periodStartDate: DateTime(2026, 11, 2),
+        periodEndDate: DateTime(2026, 11, 13),
+      ),
+      throwsA(isA<StateError>()),
+    );
+    expect(await repository.getPostingsForExport(), isEmpty);
+  });
+
 }
