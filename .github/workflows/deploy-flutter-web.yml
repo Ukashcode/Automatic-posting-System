@@ -5,9 +5,11 @@ on:
     branches:
       - main
       - feature/posting-preview-date-exports
+      - fix/posting-preview-runtime-errors
   pull_request:
     branches:
       - main
+      - feature/posting-preview-date-exports
   workflow_dispatch:
 
 permissions:
